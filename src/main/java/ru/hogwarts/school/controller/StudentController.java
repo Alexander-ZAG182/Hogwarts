@@ -5,10 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.model.DTO.StudentDTO;
 import ru.hogwarts.school.service.StudentService;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 @RestController
 @RequestMapping("/student")
@@ -19,9 +19,18 @@ public class StudentController {
         this.studentService = studentService;
     }
 
+    @PutMapping
+    public ResponseEntity<Student> editStudent(@RequestBody Student student) {
+        Student updatedStudent = studentService.updateStudent(student);
+        if (updatedStudent == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        return ResponseEntity.ok(updatedStudent);
+    }
+
     @GetMapping("{id}")
     public ResponseEntity<Student> getStudentInfo(@PathVariable Long id) {
-        Student student = studentService.findStudent(id);
+        Student student = studentService.getStudentById(id);
         if (student == null) {
             return ResponseEntity.notFound().build();
         }
@@ -29,18 +38,9 @@ public class StudentController {
     }
 
     @PostMapping
-    public long createStudent(@RequestBody Student student) {
+    public ResponseEntity<Student> createStudent(@RequestBody StudentDTO student) {
         Student savedStudent = studentService.addStudent(student);
-        return savedStudent.getId();
-    }
-
-    @PutMapping
-    public ResponseEntity<Student> editStudent(@RequestBody Student student) {
-        Student foundStudent = studentService.editStudent(student);
-        if (foundStudent == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-        return ResponseEntity.ok(foundStudent);
+        return ResponseEntity.ok(savedStudent);
     }
 
     @DeleteMapping("{id}")
@@ -50,29 +50,30 @@ public class StudentController {
     }
 
     @GetMapping
-    public ResponseEntity<Collection<Student>> findStudents(@RequestParam(required = false) Integer age) {
+    public ResponseEntity<List<Student>> getStudentsByAge(@RequestParam(required = false) Integer age) {
         if (age != null) {
-            return ResponseEntity.ok(studentService.findAll());
+            return ResponseEntity.ok(studentService.getStudentsByAge(age));
         }
-        return ResponseEntity.ok(Collections.emptyList());
+        return ResponseEntity.ok(studentService.getAllStudents());
     }
 
     @GetMapping("/age-between")
-    public ResponseEntity<Collection<Student>> findStudentsByAgeBetween(
+    public ResponseEntity<List<Student>> getStudentsByAgeRange(
             @RequestParam int minAge,
             @RequestParam int maxAge) {
-        if (minAge > 0 && maxAge > minAge) {
+        try {
             return ResponseEntity.ok(studentService.findByAgeBetween(minAge, maxAge));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.badRequest().build();
     }
 
     @GetMapping("/{id}/faculty")
-    public ResponseEntity<Faculty> getFacultyByStudent(@PathVariable Long id) {
-        Student student = studentService.findStudent(id);
-        if (student == null || student.getFaculty() == null) {
+    public ResponseEntity<Faculty> getFacultyByStudentId(@PathVariable Long id) {
+        Faculty faculty = studentService.getFacultyByStudentId(id);
+        if (faculty == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(student.getFaculty());
+        return ResponseEntity.ok(faculty);
     }
 }
