@@ -26,9 +26,7 @@ public class StudentService {
 
     public Student addStudent(StudentDTO student) {
         Faculty faculty = null;
-        // Если у студента указан факультет
         if (student.getFacultyId() != null && student.getFacultyId() != null) {
-            // Находим факультет в базе
             faculty = facultyRepository.findById(student.getFacultyId())
                     .orElseThrow(() -> new IllegalArgumentException("Faculty not found with id: " + student.getFacultyId()));
         }
