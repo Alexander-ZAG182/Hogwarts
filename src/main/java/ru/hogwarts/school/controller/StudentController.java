@@ -76,22 +76,4 @@ public class StudentController {
         }
         return ResponseEntity.ok(faculty);
     }
-
-    @GetMapping("/count")
-    public ResponseEntity<Long> getStudentsCount() {
-        Long count = studentService.getStudentsCount();
-        return ResponseEntity.ok(count);
-    }
-
-    @GetMapping("/average-age")
-    public ResponseEntity<Double> getAverageAge() {
-        Double averageAge = studentService.getAverageAge();
-        return ResponseEntity.ok(averageAge);
-    }
-
-    @GetMapping("/last-five")
-    public ResponseEntity<List<Student>> getLastFiveStudents() {
-        List<Student> lastFive = studentService.getLastFiveStudents();
-        return ResponseEntity.ok(lastFive);
-    }
 }
