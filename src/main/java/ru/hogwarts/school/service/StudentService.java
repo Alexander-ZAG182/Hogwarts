@@ -2,9 +2,11 @@ package ru.hogwarts.school.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import ru.hogwarts.school.model.Avatar;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.model.DTO.StudentDTO;
+import ru.hogwarts.school.repository.AvatarRepository;
 import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
 
@@ -17,25 +19,35 @@ import java.util.Optional;
 public class StudentService {
     private final StudentRepository studentRepository;
     private final FacultyRepository facultyRepository;
+    private final AvatarRepository avatarRepository;
 
     public StudentService(StudentRepository studentRepository,
-                          FacultyRepository facultyRepository) {
+                          FacultyRepository facultyRepository, AvatarRepository avatarRepository) {
         this.studentRepository = studentRepository;
         this.facultyRepository = facultyRepository;
+        this.avatarRepository = avatarRepository;
     }
 
     public Student addStudent(StudentDTO student) {
         Faculty faculty = null;
-        if (student.getFacultyId() != null && student.getFacultyId() != null) {
+        if (student.getFacultyId() != null) {
             faculty = facultyRepository.findById(student.getFacultyId())
                     .orElseThrow(() -> new IllegalArgumentException("Faculty not found with id: " + student.getFacultyId()));
         }
+        Avatar avatar = null;
+        if (student.getAvatarId() != null) {
+            avatar = avatarRepository.getReferenceById(student.getAvatarId());
+        }
+
+
         Student studentForSave = new Student();
         studentForSave.setName(student.getName());
         studentForSave.setAge(student.getAge());
         studentForSave.setFaculty(faculty);
+        studentForSave.setAvatar(avatar);
         return studentRepository.save(studentForSave);
     }
+
 
     public Student getStudentById(Long id) {
         return studentRepository.findById(id).orElse(null);

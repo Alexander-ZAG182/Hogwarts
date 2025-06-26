@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import java.util.Objects;
 
@@ -21,32 +23,55 @@ public class Student {
     @JsonIgnore
     private Faculty faculty;
 
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "avatar_id", nullable = true)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JsonIgnore
+    private Avatar avatar;
+
     public Student() {
     }
-    public int getAge(){return age;}
+
+    public int getAge() {
+        return age;
+    }
+
     public Long getId() {  // Теперь возвращает Long
         return id;
     }
+
     public Faculty getFaculty() {
         return faculty;
     }
+
     public void setFaculty(Faculty faculty) {
         this.faculty = faculty;
     }
+
     public void setId(Long id) {  // Принимает Long
         this.id = id;
     }
+
     public void setName(String name) {
         this.name = name;
     }
+
     public String getName() {
         return name;
     }
+
     public void setAge(int age) {
         this.age = age;
     }
 
-    // Измененный конструктор
+    public Avatar getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(Avatar avatar) {
+        this.avatar = avatar;
+    }
+
     public Student(Long id, String name, int age) {
         this.id = id;
         this.name = name;
@@ -80,4 +105,6 @@ public class Student {
                 ", faculty=" + (faculty != null ? faculty.getName() : "null") +
                 '}';
     }
+
+
 }
