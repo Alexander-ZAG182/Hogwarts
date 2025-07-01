@@ -1,0 +1,17 @@
+DROP TABLE IF EXISTS Person CASCADE;
+DROP TABLE IF EXISTS Car CASCADE;
+
+CREATE TABLE Car (
+    id SERIAL PRIMARY KEY,
+    brand VARCHAR(50) NOT NULL,
+    model VARCHAR(50) NOT NULL,
+    price NUMERIC(10, 2) CHECK (price > 0)
+);
+
+CREATE TABLE Person (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    age INT NOT NULL,
+    has_license BOOLEAN NOT NULL,
+    car_id BIGINT REFERENCES Car(id)
+);
