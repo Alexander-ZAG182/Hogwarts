@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/scripts/v1-initial-schema.sql
+  - include:
+      file: liquibase/scripts/index-practice.sql
