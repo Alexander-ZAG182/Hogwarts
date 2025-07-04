@@ -1,6 +1,8 @@
 package ru.hogwarts.school.service;
 
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Avatar;
 import ru.hogwarts.school.model.Faculty;
@@ -20,6 +22,7 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final FacultyRepository facultyRepository;
     private final AvatarRepository avatarRepository;
+    private final Logger logger = LoggerFactory.getLogger(StudentService.class);
 
     public StudentService(StudentRepository studentRepository,
                           FacultyRepository facultyRepository, AvatarRepository avatarRepository) {
@@ -29,16 +32,19 @@ public class StudentService {
     }
 
     public Student addStudent(StudentDTO student) {
+        logger.info("Was invoked method: addStudent");
         Faculty faculty = null;
         if (student.getFacultyId() != null) {
             faculty = facultyRepository.findById(student.getFacultyId())
-                    .orElseThrow(() -> new IllegalArgumentException("Faculty not found with id: " + student.getFacultyId()));
+                    .orElseThrow(() -> {
+                        logger.error("Faculty not found: id={}", student.getFacultyId());
+                        return new IllegalArgumentException("Faculty not found with id: " + student.getFacultyId());
+                    });
         }
         Avatar avatar = null;
         if (student.getAvatarId() != null) {
             avatar = avatarRepository.getReferenceById(student.getAvatarId());
         }
-
 
         Student studentForSave = new Student();
         studentForSave.setName(student.getName());
@@ -48,64 +54,81 @@ public class StudentService {
         return studentRepository.save(studentForSave);
     }
 
-
     public Student getStudentById(Long id) {
+        logger.debug("Was invoked method: getStudentById(id={})", id);
         return studentRepository.findById(id).orElse(null);
     }
 
     public Student updateStudent(Student student) {
+        logger.info("Was invoked method: updateStudent(id={})", student.getId());
         if (studentRepository.existsById(student.getId())) {
             return studentRepository.save(student);
         }
+        logger.warn("Student not found for update: id={}", student.getId());
         return null;
     }
 
     public void deleteStudent(Long id) {
+        logger.warn("Was invoked method: deleteStudent(id={})", id);
         studentRepository.deleteById(id);
     }
 
     public List<Student> findByAge(int age) {
+        logger.debug("Was invoked method: findByAge(age={})", age);
         return studentRepository.findByAge(age);
     }
 
     public List<Student> findByAgeBetween(int minAge, int maxAge) {
+        logger.debug("Was invoked method: findByAgeBetween(min={}, max={})", minAge, maxAge);
         if (minAge < 0 || maxAge < 0 || minAge > maxAge) {
+            logger.error("Invalid age range: min={}, max={}", minAge, maxAge);
             throw new IllegalArgumentException("Invalid age range parameters");
         }
         return studentRepository.findByAgeBetween(minAge, maxAge);
     }
 
     public List<Student> getStudentsByAge(Integer age) {
+        logger.debug("Was invoked method: getStudentsByAge(age={})", age);
         if (age == null) {
+            logger.warn("Age parameter is null");
             return Collections.emptyList();
         }
         return studentRepository.findByAge(age);
     }
 
     public List<Student> getAllStudents() {
+        logger.info("Was invoked method: getAllStudents");
         return studentRepository.findAll();
     }
 
     public Faculty getFacultyByStudentId(Long id) {
+        logger.debug("Was invoked method: getFacultyByStudentId(id={})", id);
         Optional<Student> student = studentRepository.findById(id);
         if (student.isPresent() && student.get().getFaculty() != null) {
             return student.get().getFaculty();
-        } else throw new IllegalArgumentException("Student not found with id: " + id);
+        } else {
+            logger.error("Student not found or has no faculty: id={}", id);
+            throw new IllegalArgumentException("Student not found with id: " + id);
+        }
     }
 
     public List<Student> findAll() {
+        logger.info("Was invoked method: findAll");
         return studentRepository.findAll();
     }
 
     public Long getStudentsCount() {
+        logger.info("Was invoked method: getStudentsCount");
         return studentRepository.countAllStudents();
     }
 
     public Double getAverageAge() {
+        logger.info("Was invoked method: getAverageAge");
         return studentRepository.findAverageAge();
     }
 
     public List<Student> getLastFiveStudents() {
+        logger.info("Was invoked method: getLastFiveStudents");
         return studentRepository.findLastFiveStudents();
     }
 }
