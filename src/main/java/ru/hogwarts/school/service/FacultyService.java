@@ -85,8 +85,7 @@ public class FacultyService {
 
     public String getLongestFacultyName() {
         logger.info("Was invoked method: getLongestFacultyName");
-        return facultyRepository.findAll().stream()
-                .map(Faculty::getName)
+        return facultyRepository.findAllFacultyNames().stream()
                 .filter(Objects::nonNull)
                 .max(Comparator.comparingInt(String::length))
                 .orElse(null);

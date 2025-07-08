@@ -135,8 +135,7 @@ public class StudentService {
 
     public List<String> getStudentNamesStartingWithA() {
         logger.info("Was invoked method: getStudentNamesStartingWithA");
-        return studentRepository.findAll().stream()
-                .map(Student::getName)
+        return studentRepository.findAllStudentNames().stream()
                 .filter(name -> name != null &&
                         (name.toUpperCase().startsWith("А") ||
                                 name.toUpperCase().startsWith("A")))
@@ -147,8 +146,8 @@ public class StudentService {
 
     public double getAverageAgeViaStream() {
         logger.info("Was invoked method: getAverageAgeViaStream");
-        return studentRepository.findAll().stream()
-                .mapToInt(Student::getAge)
+        return studentRepository.findAllStudentAges().stream()
+                .mapToInt(Integer::intValue)
                 .average()
                 .orElse(0.0);
     }
