@@ -151,4 +151,54 @@ public class StudentService {
                 .average()
                 .orElse(0.0);
     }
+
+    public void printStudentsInParallel() {
+        logger.info("Was invoked method: printStudentsInParallel");
+        List<Student> students = getAllStudents();
+        if (students.size() < 6) {
+            logger.warn("Not enough students (min 6)");
+            System.out.println("Недостаточно студентов, минимум 6");
+            return;
+        }
+
+        System.out.println("Первый студент - " + students.get(0).getName());
+        System.out.println("Второй студент - " + students.get(1).getName());
+
+        new Thread(() -> {
+            System.out.println("Третий студент - " + students.get(2).getName());
+            System.out.println("Четвертый студент - " + students.get(3).getName());
+        }).start();
+
+        new Thread(() -> {
+            System.out.println("Пятый студент - " + students.get(4).getName());
+            System.out.println("Шестой студент - " + students.get(5).getName());
+        }).start();
+    }
+
+    public void printStudentsSynchronized() {
+        logger.info("Was invoked method: printStudentsSynchronized");
+        List<Student> students = getAllStudents();
+        if (students.size() < 6) {
+            logger.warn("Not enough students (min 6)");
+            System.out.println("Недостаточно студентов (минимум 6)");
+            return;
+        }
+
+        printNameSynchronized("Первый студент - " + students.get(0).getName());
+        printNameSynchronized("Второй студент - " + students.get(1).getName());
+
+        new Thread(() -> {
+            printNameSynchronized("Третий студент - " + students.get(2).getName());
+            printNameSynchronized("Четвертый студент - " + students.get(3).getName());
+        }).start();
+
+        new Thread(() -> {
+            printNameSynchronized("Пятый студент - " + students.get(4).getName());
+            printNameSynchronized("Шестой студент - " + students.get(5).getName());
+        }).start();
+    }
+
+    private synchronized void printNameSynchronized(String name) {
+        System.out.println(name);
+    }
 }
