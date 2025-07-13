@@ -107,49 +107,12 @@ public class StudentController {
 
     @GetMapping("/print-parallel")
     public void printStudentInParallel() {
-        List<Student> students = studentService.getAllStudents();
-        if (students.size() < 6) {
-            System.out.println("Недостаточно студентов , минимум 6");
-            return;
-        }
-
-        System.out.println("Первый студент - " + students.get(0).getName());
-        System.out.println("Второй студент - " + students.get(1).getName());
-
-        new Thread(() -> {
-            System.out.println("Третий студент - " + students.get(2).getName());
-            System.out.println("Четвертый студент - " + students.get(3).getName());
-        }).start();
-
-        new Thread (() -> {
-            System.out.println("Пятый студент - " + students.get(4).getName());
-            System.out.println("Шестой студент - " + students.get(5).getName());
-        }).start();
-    }
-
-    private synchronized void printName (String name) {
-        System.out.println(name);
+        studentService.printStudentsInParallel();
     }
 
     @GetMapping("/print-synchronized")
     public void printStudentsSynchronized() {
-        List<Student> students = studentService.getAllStudents();
-        if (students.size() < 6) {
-            System.out.println("Недостаточно студентов (минимум 6)");
-            return;
-        }
-
-        printName("Первый студент - " + students.get(0).getName());
-        printName("Второй студент - " + students.get(1).getName());
-
-        new Thread(() -> {
-            printName("Третий студент - " + students.get(2).getName());
-            printName("Четвертый студент - " + students.get(3).getName());
-        }).start();
-
-        new Thread(() -> {
-            printName("Пятый студент - " + students.get(4).getName());
-            printName("Шестой студент - " + students.get(5).getName());
-        }).start();
+        studentService.printStudentsSynchronized();
     }
+
 }
